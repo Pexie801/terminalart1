@@ -24,44 +24,49 @@ ColorArray[13]='\033[1;36m' #LCyan
 ColorArray[14]='\033[0;37m' #Lgrey
 ColorArray[15]='\033[1;37m' #White
 
-### Detect terminal size
+# Varables
+REFRESH=.001
+BACKGROUND=${ColorArray[0]}
+OBJCOLOR=${ColorArray[12]}
+LOOPS=0 # How many times the screen with refresh
+# Detect and set terminal size
 WIDTH=$(tput cols)
 HEIGHT=$(tput lines)
-
-LOOPS=6
-
-
 #draw square
-SQUARE[0]=2
-SQUARE[1]=2
+SquareWidth=4
+SquareHeight=4
+#Where to draw square
+DrawObjX=4
+((DrawObjY=($HEIGHT/2)-($SquareHeight/2)))  #Centers the height
 
-DrawObjX=16
-DrawObjY=16
-
-### Main Code ###
-#Loop Test
-
-## Clear Screen
-echo "clear"
-
-for (( x = 4; x <= $LOOPS; x +=2 )) {
-
-    #ROWS
-    for ((j = 0; j < $HEIGHT; j += 1 )) {
-        #LINE
-        for ((i = 0; i < $WIDTH; i += 1 )) {
-            if [[ i -eq $DrawObjX && j -eq $DrawObjY ]]; then                
-                printf "${ColorArray[2]}*"
-                if [[ $DrawObjX <  ]]
-            else            
-                #Prints Base Color BLUE
-                printf "${ColorArray[8]}*"
-            fi
+# DRAW SQUARE ON SCREEN FUNCTION
+draw_screen () {
+    for (( x = 0; x <= $LOOPS; x +=2 )) {
+        #ROWS
+        for ((j = 0; j < $HEIGHT; j += 1 )) {
+            #LINE
+            for ((i = 0; i < $WIDTH; i += 1 )) {
+                if [[ i -ge $DrawObjX && i -lt $DrawObjX+$SquareWidth && j -ge $DrawObjY && j -lt $DrawObjY+$SquareHeight ]]; then
+                    printf "$OBJCOLOR*"
+                else            
+                    #Back
+                    printf "$BACKGROUND*"
+                fi
+            }
+        sleep $REFRESH
+        printf "\n"
         }
-    sleep .02
-    printf "\n"
-    }
 
+    }
 }
+#Main Loop
+
+for (( y = 0; y < $WIDTH; y += 2 )) {
+    clear 
+    draw_screen
+    #Movement
+    ((DrawObjX+=2))
+}
+
 ## Reset terminal color
 printf "${ColorArray[15]} END OF LINE...\n"
