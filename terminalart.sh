@@ -27,7 +27,7 @@
 #VARABLIES
 REFRESH=.05
 BACKGROUND=${ColorArray[0]}
-OBJCOLOR=${ColorArray[12]}
+OBJCOLOR=${ColorArray[11]}
 WIDTH=$(tput cols)      #WIDTH of window (TERMINAL)
 HEIGHT=$(tput lines)    #HEIGHT of window (TERMINAL)
 
@@ -36,7 +36,7 @@ SquareWidth=8
 SquareHeight=4
 
 #DRAW CURSOR
-DrawObjX=4
+DrawObjX=0
 ((DrawObjY=($HEIGHT/2)-($SquareHeight/2)))  #Centers the height
 
 #DRAWS the image in windows (NEW)
@@ -44,12 +44,28 @@ draw_canvas () {
     local i j x y line tcount
     clear
     #ROW
+
+    #J is number of ROWS
+    #I is place on row
+
     for ((j = 0; j < $HEIGHT; j += 1)) {
         #COLUMS
         line=()
         for ((i = 0; i < $WIDTH; i += 1)) {
             if [[ i -ge $DrawObjX && i -lt $DrawObjX+$SquareWidth && j -ge $DrawObjY && j -lt $DrawObjY+$SquareHeight ]]; then
-                line+="$OBJCOLOR*"
+              #IF J = DrawObjY
+              case $stripCount in
+                1-5 ) line+="$color1*"
+                  ;;
+                6-10 ) line+="$color2*"
+                  ;;
+                11-15 ) line+="$color3*"
+                  ;;
+                *) line+="$OBJCOLOR*"
+                ;;
+              esac
+              (($stripCount+=1))
+                #line+="$OBJCOLOR*"
             else
                 line+="$BACKGROUND*"
             fi
@@ -61,14 +77,19 @@ draw_canvas () {
 #DRAW TRANS FLAG
 draw_tflag ()
 {
-    local strips sizeX sizeY
+    local strips stripCount sizeX sizeY color1 color2 color3
     clear
+    color1=${ColorArray[12]}
+    color2=${ColorArray[11]}
+    color3=${ColorArray[15]}
     strips=5
+    stripCount=0
     sizeY=20
+    ((stripSize=$sizeY/strips))
     ((sizeX=$sizeY*4))
-    
     SquareWidth=$sizeX
     SquareHeight=$sizeY
+
     draw_canvas
 }
 
